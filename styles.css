@@ -1,0 +1,80 @@
+.divPageBody {
+	width: 80%;
+	margin-top: 100px;
+	margin-left: auto;
+	margin-right: auto;
+	margin-bottom: 500px;
+	}
+
+.divDemoTabsContainer {
+	}
+.divDemoTabsContainer .divTabContent {
+	font-size: 42px;
+	}
+
+.divTabsContainer {
+	width: 680px;
+	}
+.divTabsContainer .divTabs {
+	}
+.divTabsContainer .divTabs .nav-tabs > li > a {
+	cursor: pointer;
+	color: inherit;
+	line-height: 16px;
+	}
+.divTabsContainer .divTabs .nav-tabs {
+	margin-bottom: -1px;
+	}
+.divTabsContainer .divTabs .iTabIcon {
+	opacity: .5;
+	font-weight: normal;
+	padding-right: 5px;
+	width: 1em; 
+	text-align: left;
+	}
+.divTabsContainer .divTabs li {
+	font-family: "Ubuntu";
+	font-size: 16px;
+	width: 150px;
+	border-bottom: 1px solid  rgb(221, 221, 221);
+	}
+.divTabsContainer .divTabs .active {
+	border-bottom: 1px solid  white;
+	}
+.divTabsContainer .spCloseBox {
+	float: right;
+	visibility: hidden;
+	font-weight: normal;
+	}
+.divTabsContainer .divTabContent {
+	margin-top: -1px;
+	min-height: 600px;
+	background-color: white;
+	border: 1px solid rgb(221, 221, 221);
+	padding-top: 30px;
+	padding-left: 40px;
+	padding-right: 40px;
+	}
+
+.divTabsContainer .popover-title {
+	font-weight: bold;
+	font-size: 14px;
+	}
+.divTabsContainer .popover-content {
+	}
+.divTabsContainer .popover-content td {
+	vertical-align: top;
+	font-size: 14px;
+	padding-bottom: 5px;
+	}
+.divTabsContainer .popover-content tr td:first-child {
+	padding-right: 3px;
+	}
+.divTabsContainer .popover-content tr td:first-child::after {
+	content: ":";
+	}
+
+.divTabsContainer .divRiverSection .spFeedPubDate, .divTabsContainer .divRiverSection .spFeedTitle {
+	background: white;
+	}
+
