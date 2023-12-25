@@ -1,20 +1,43 @@
 const appConsts = {
 	urlFeedlandServer: "https://feedland.com/"
 	}
+
 var theTabs =  {
 	all: {
-		enabled: true,
 		name: "All",
 		description: "News from all the feeds Dave is following.",
 		screenname: "davewiner",
 		catname: "All"
 		},
 	politics: {
-		enabled: true,
 		name: "Politics",
 		description: "Political news from the feeds Dave is following.",
 		screenname: "davewiner",
 		catname: "politics"
+		},
+	tech: {
+		name: "Tech",
+		description: "Political news from the feeds Dave is following.",
+		screenname: "davewiner",
+		catname: "tech"
+		},
+	podcasts: {
+		name: "Podcasts",
+		description: "Political news from the feeds Dave is following.",
+		screenname: "davewiner",
+		catname: "podcasts"
+		},
+	bloggers: {
+		name: "Bloggers",
+		description: "Political news from the feeds Dave is following.",
+		screenname: "davewiner",
+		catname: "bloggers"
+		},
+	dave: {
+		name: "Dave",
+		description: "Political news from the feeds Dave is following.",
+		screenname: "davewiner",
+		catname: "dave"
 		}
 	}
 function startup () {

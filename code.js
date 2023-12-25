@@ -11,6 +11,7 @@ function tabsManager (userOptions, callback) {
 		containerClass: "tabsContainer",
 		nameActiveTab: undefined,
 		theTabs: undefined,
+		flCloseBoxes: true, //12/25/23 by DW
 		deleteTabCallback: function (tabRec) {
 			},
 		getInfoTableForTab: function (tabRec) {
@@ -106,13 +107,17 @@ function tabsManager (userOptions, callback) {
 			var tabRec = findTabWithName (liTab.attr ("name"))
 			displayTabContents (tabRec);
 			}
+		function isEnabled (tabRec) { //enabled defaults to true
+			const enabled = (tabRec.enabled === undefined) ? true : getBoolean (tabRec.enabled);
+			return (enabled);
+			}
 		
 		divTabContent = $("<div class=\"divTabContent\"></div>");
 		
 		var flFoundTab = false, firstTab = undefined;
 		for (var x in options.theTabs) {
 			let item = options.theTabs [x];
-			if (item.enabled) {
+			if (isEnabled (item)) {
 				function getAnchor () {
 					const theAnchor = $("<a data-toggle=\"tab\"></a>");
 					
@@ -120,7 +125,9 @@ function tabsManager (userOptions, callback) {
 					const iconHtml = "<i class=\"iTabIcon " + iconClass + "\"></i>";
 					const theIcon = $(iconHtml);
 					const theName = $("<span>" + item.name + "</span>");
-					const theCloseBox = $("<span class=\"spCloseBox\">x</span>");
+					
+					const spCloseBoxDisabled = (options.flCloseBoxes) ? "" : " spCloseBoxDisabled "; //12/25/23 by DW
+					const theCloseBox = $("<span class=\"spCloseBox" + spCloseBoxDisabled + "\">x</span>");
 					theAnchor.append (theIcon);
 					theAnchor.append (theName);
 					theAnchor.append (theCloseBox);
