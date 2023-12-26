@@ -39,6 +39,13 @@ function tabsManager (userOptions, callback) {
 		options.nameActiveTab = getNthTab (0).name;
 		}
 	
+	
+	function isMobileDevice () { //12/10/23 by DW
+		const flMobile = window.innerWidth <= 576;
+		return (flMobile);
+		}
+	const maxTabs = (isMobileDevice ()) ? 4 : infinity; //12/10/23 by DW
+	
 	function viewRiver (tabRec) {
 		const riverSpec = {
 			screenname: tabRec.screenname,
@@ -80,9 +87,7 @@ function tabsManager (userOptions, callback) {
 		}
 	
 	function setupDomStructure () {
-		const divUsersContainer = $("<div class=\"" + options.containerClass + "\"></div>");
 		const divContainer = $("<div class=\"divTabsContainer\"></div>");
-		divUsersContainer.append (divContainer);
 		const divTabs = $("<div class=\"divTabs\"></div>");
 		const ulTabs = $("<ul class=\"nav nav-tabs\"></ul>");
 		
@@ -96,7 +101,9 @@ function tabsManager (userOptions, callback) {
 			return (undefined);
 			}
 		function makeActiveCloseBoxVisible () {
-			$(".divTabsContainer ul li.active span.spCloseBox").css ("visibility", "visible");
+			if (options.flCloseBoxes) { //12/25/23 by DW
+				$(".divTabsContainer ul li.active span.spCloseBox").css ("visibility", "visible");
+				}
 			}
 		function setActiveTab (liTab) {
 			$(".spCloseBox").css ("visibility", "hidden"); //hide all closeboxes
@@ -114,90 +121,93 @@ function tabsManager (userOptions, callback) {
 		
 		divTabContent = $("<div class=\"divTabContent\"></div>");
 		
-		var flFoundTab = false, firstTab = undefined;
+		var flFoundTab = false, firstTab = undefined, ctTabs = 0;
 		for (var x in options.theTabs) {
 			let item = options.theTabs [x];
-			if (isEnabled (item)) {
-				function getAnchor () {
-					const theAnchor = $("<a data-toggle=\"tab\"></a>");
-					
-					const iconClass = (item.icon === undefined) ? options.defaultIcon : item.icon;
-					const iconHtml = "<i class=\"iTabIcon " + iconClass + "\"></i>";
-					const theIcon = $(iconHtml);
-					const theName = $("<span>" + item.name + "</span>");
-					
-					const spCloseBoxDisabled = (options.flCloseBoxes) ? "" : " spCloseBoxDisabled "; //12/25/23 by DW
-					const theCloseBox = $("<span class=\"spCloseBox" + spCloseBoxDisabled + "\">x</span>");
-					theAnchor.append (theIcon);
-					theAnchor.append (theName);
-					theAnchor.append (theCloseBox);
-					
-					theCloseBox.click (function (ev) {
-						console.log ("click closebox");
-						ev.stopPropagation ();
+			if (ctTabs < maxTabs) {
+				if (isEnabled (item)) {
+					function getAnchor () {
+						const theAnchor = $("<a data-toggle=\"tab\"></a>");
 						
-						function closeTab () {
-							var newTab = liTab.next ();
-							if (newTab.length == 0) {
-								newTab = liTab.prev ();
+						const iconClass = (item.icon === undefined) ? options.defaultIcon : item.icon;
+						const iconHtml = "<i class=\"iTabIcon " + iconClass + "\"></i>";
+						const theIcon = $(iconHtml);
+						const theName = $("<span>" + item.name + "</span>");
+						
+						const spCloseBoxDisabled = (options.flCloseBoxes) ? "" : " spCloseBoxDisabled "; //12/25/23 by DW
+						const theCloseBox = $("<span class=\"spCloseBox" + spCloseBoxDisabled + "\">x</span>");
+						theAnchor.append (theIcon);
+						theAnchor.append (theName);
+						theAnchor.append (theCloseBox);
+						
+						theCloseBox.click (function (ev) {
+							console.log ("click closebox");
+							ev.stopPropagation ();
+							
+							function closeTab () {
+								var newTab = liTab.next ();
+								if (newTab.length == 0) {
+									newTab = liTab.prev ();
+									}
+								if (newTab.length > 0) {
+									var tabRec = findTabWithName (liTab.attr ("name"))
+									options.deleteTabCallback (tabRec);
+									liTab.remove ();
+									setActiveTab (newTab);
+									}
+								else {
+									alertDialog ("Can't remove the last tab, sorry.");
+									}
 								}
-							if (newTab.length > 0) {
-								var tabRec = findTabWithName (liTab.attr ("name"))
-								options.deleteTabCallback (tabRec);
-								liTab.remove ();
-								setActiveTab (newTab);
+							if (options.flConfirmTabClosing) {
+								confirmDialog ("Really close this tab?", function () {
+									closeTab ();
+									});
 								}
 							else {
-								alertDialog ("Can't remove the last tab, sorry.");
-								}
-							}
-						if (options.flConfirmTabClosing) {
-							confirmDialog ("Really close this tab?", function () {
 								closeTab ();
-								});
-							}
-						else {
-							closeTab ();
-							}
-						});
-					theIcon.mouseenter (function () {
-						const htmltext = options.getInfoTableForTab (findTabWithName (liTab.attr ("name")));
-						if (htmltext !== undefined) {
-							theIcon.data ("toggle", "popover");
-							theIcon.data ("placement", "bottom");
-							theIcon.data ("html", "true");
-							theIcon.data ("content", htmltext);
-							theIcon.data ("title", iconHtml + item.name);
-							theIcon.popover ("show");
-							}
-						});
-					theIcon.mouseleave (function () {
-						theIcon.popover ("hide");
-						});
-					
-					return (theAnchor);
-					}
-				let liTab = $("<li class=\"liTab\"></li>");
-				liTab.attr ("name", item.name);
-				liTab.append (getAnchor ());
-				if (firstTab === undefined) {
-					firstTab = {
-						liTab,
-						item
+								}
+							});
+						theIcon.mouseenter (function () {
+							const htmltext = options.getInfoTableForTab (findTabWithName (liTab.attr ("name")));
+							if (htmltext !== undefined) {
+								theIcon.data ("toggle", "popover");
+								theIcon.data ("placement", "bottom");
+								theIcon.data ("html", "true");
+								theIcon.data ("content", htmltext);
+								theIcon.data ("title", iconHtml + item.name);
+								theIcon.popover ("show");
+								}
+							});
+						theIcon.mouseleave (function () {
+							theIcon.popover ("hide");
+							});
+						
+						return (theAnchor);
 						}
+					let liTab = $("<li class=\"liTab\"></li>");
+					liTab.attr ("name", item.name);
+					liTab.append (getAnchor ());
+					if (firstTab === undefined) {
+						firstTab = {
+							liTab,
+							item
+							}
+						}
+					ulTabs.append (liTab);
+					if (equalStrings (item.name, options.nameActiveTab)) {
+						setActiveTab (liTab);
+						flFoundTab = true;
+						}
+					if (options.flDescriptionTooltip) {
+						addToolTip (icon, item.description);
+						}
+					liTab.click (function () {
+						setActiveTab (liTab);
+						pushState (item.name);
+						});
+					ctTabs++;
 					}
-				ulTabs.append (liTab);
-				if (equalStrings (item.name, options.nameActiveTab)) {
-					setActiveTab (liTab);
-					flFoundTab = true;
-					}
-				if (options.flDescriptionTooltip) {
-					addToolTip (icon, item.description);
-					}
-				liTab.click (function () {
-					setActiveTab (liTab);
-					pushState (item.name);
-					});
 				}
 			}
 		if ((!flFoundTab) && (firstTab !== undefined)) {
@@ -207,10 +217,10 @@ function tabsManager (userOptions, callback) {
 		divContainer.append (divTabs);
 		divContainer.append (divTabContent);
 		divTabs.append (ulTabs);
-		divUsersContainer.on ("afterinsert", function () {
+		divContainer.on ("afterinsert", function () {
 			makeActiveCloseBoxVisible ();
 			});
-		return (divUsersContainer);
+		return (divContainer);
 		}
 	
 	const divContainer = setupDomStructure ();
