@@ -85,21 +85,21 @@ function tabsManager (userOptions, callback) {
 			};
 		history.pushState (state, "", location.pathname + "?tab=" + encodeURIComponent (stringLower (tabname)));
 		}
+	function findTabWithName (theName) {
+		for (var x in options.theTabs) {
+			let item = options.theTabs [x];
+			if (item.name == theName) {
+				return (item);
+				}
+			}
+		return (undefined);
+		}
 	
 	function setupDomStructure () {
 		const divContainer = $("<div class=\"divTabsContainer\"></div>");
 		const divTabs = $("<div class=\"divTabs\"></div>");
 		const ulTabs = $("<ul class=\"nav nav-tabs\"></ul>");
 		
-		function findTabWithName (theName) {
-			for (var x in options.theTabs) {
-				let item = options.theTabs [x];
-				if (item.name == theName) {
-					return (item);
-					}
-				}
-			return (undefined);
-			}
 		function makeActiveCloseBoxVisible () {
 			if (options.flCloseBoxes) { //12/25/23 by DW
 				$(".divTabsContainer ul li.active span.spCloseBox").css ("visibility", "visible");
@@ -245,4 +245,10 @@ function tabsManager (userOptions, callback) {
 				});
 			}
 		});
+	
+	this.getActiveTab = function () {
+		const name = $(".divTabsContainer .divTabs .active").attr ("name");
+		var tabRec = findTabWithName (name)
+		return (tabRec);
+		};
 	}
