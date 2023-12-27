@@ -12,6 +12,7 @@ function tabsManager (userOptions, callback) {
 		nameActiveTab: undefined,
 		theTabs: undefined,
 		flCloseBoxes: true, //12/25/23 by DW
+		flCloseBoxesJustBeep: false, //12/27/23 by DW -- want them visible, but want them to do nothing
 		deleteTabCallback: function (tabRec) {
 			},
 		getInfoTableForTab: function (tabRec) {
@@ -144,28 +145,33 @@ function tabsManager (userOptions, callback) {
 							console.log ("click closebox");
 							ev.stopPropagation ();
 							
-							function closeTab () {
-								var newTab = liTab.next ();
-								if (newTab.length == 0) {
-									newTab = liTab.prev ();
-									}
-								if (newTab.length > 0) {
-									var tabRec = findTabWithName (liTab.attr ("name"))
-									options.deleteTabCallback (tabRec);
-									liTab.remove ();
-									setActiveTab (newTab);
-									}
-								else {
-									alertDialog ("Can't remove the last tab, sorry.");
-									}
-								}
-							if (options.flConfirmTabClosing) {
-								confirmDialog ("Really close this tab?", function () {
-									closeTab ();
-									});
+							if (options.flCloseBoxesJustBeep) { //12/27/23 by DW
+								speakerBeep ();
 								}
 							else {
-								closeTab ();
+								function closeTab () {
+									var newTab = liTab.next ();
+									if (newTab.length == 0) {
+										newTab = liTab.prev ();
+										}
+									if (newTab.length > 0) {
+										var tabRec = findTabWithName (liTab.attr ("name"))
+										options.deleteTabCallback (tabRec);
+										liTab.remove ();
+										setActiveTab (newTab);
+										}
+									else {
+										alertDialog ("Can't remove the last tab, sorry.");
+										}
+									}
+								if (options.flConfirmTabClosing) {
+									confirmDialog ("Really close this tab?", function () {
+										closeTab ();
+										});
+									}
+								else {
+									closeTab ();
+									}
 								}
 							});
 						theIcon.mouseenter (function () {
