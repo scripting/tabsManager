@@ -1,6 +1,6 @@
 
 :root {
-	--tabs-border-color: rgb(221, 221, 221);
+	--tabs-border-color: silver;
 	--content-background-color: whitesmoke;
 	}
 
@@ -45,6 +45,9 @@
 
 .divTabsContainer .nav-tabs > .active > a, .divTabsContainer .nav-tabs > .active > a:hover, .divTabsContainer .nav-tabs > .active > a:focus {
 	background-color: var(--content-background-color);
+	border-top-color: var(--tabs-border-color);
+	border-left-color: var(--tabs-border-color);
+	border-right-color: var(--tabs-border-color);
 	}
 
 .divTabsContainer .spCloseBox {
