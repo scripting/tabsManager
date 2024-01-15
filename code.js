@@ -1,5 +1,5 @@
 function tabsManager (userOptions, callback) {
-	console.log ("tabsManager");
+	console.log ("tabsManager2");
 	
 	var divTabContent = undefined;
 	
@@ -17,6 +17,12 @@ function tabsManager (userOptions, callback) {
 			},
 		getInfoTableForTab: function (tabRec) {
 			return (undefined);
+			},
+		viewExternalType: function (tabRec, whereToAppend) {
+			console.log ("viewExternalType: tabRec == " + jsonStringify (tabRec));
+			},
+		tabClickCallback: function (tabRec) { //12/31/23 by DW
+			console.log ("tabClickCallback: tabRec == " + jsonStringify (tabRec));
 			}
 		};
 	for (var x in userOptions) {
@@ -40,7 +46,6 @@ function tabsManager (userOptions, callback) {
 		options.nameActiveTab = getNthTab (0).name;
 		}
 	
-	
 	function isMobileDevice () { //12/10/23 by DW
 		const flMobile = window.innerWidth <= 576;
 		return (flMobile);
@@ -48,11 +53,32 @@ function tabsManager (userOptions, callback) {
 	const maxTabs = (isMobileDevice ()) ? 4 : infinity; //12/10/23 by DW
 	
 	function viewRiver (tabRec) {
+		console.log ("viewRiver");
 		const riverSpec = {
 			screenname: tabRec.screenname,
 			catname: tabRec.catname
 			};
 		if (tabRec.riverDisplayData === undefined) {
+			function includeRiverItemCallback (feedItem) {
+				if (tabRec.filter === undefined) {
+					return (true);
+					}
+				else {
+					
+					try {
+						var val = eval (tabRec.filter);
+						val = getBoolean (val);
+						return (val);
+						}
+					catch (err) {
+						console.log ("includeRiverItemCallback: err.message == " + err.message);
+						return (false);
+						}
+					}
+				}
+			const options = {
+				includeRiverItemCallback
+				};
 			displayTraditionalRiver (riverSpec, divTabContent, undefined, function (err) {
 				if (err) {
 					console.log (err.message);
@@ -60,25 +86,23 @@ function tabsManager (userOptions, callback) {
 				else {
 					tabRec.riverDisplayData = $(".divRiverDisplay");
 					}
-				});
+				}, options);
 			}
 		else {
 			divTabContent.append (tabRec.riverDisplayData);
 			}
 		}
 	function displayTabContents (tabRec) {
-		divTabContent.empty ();
-		
 		const theType = (tabRec.type === undefined) ? options.defaultType : tabRec.type;
 		switch (theType) {
 			case "river":
+				divTabContent.empty ();
 				viewRiver (tabRec);
 				break;
+			default: 
+				options.viewExternalType (tabRec, divTabContent); //12/30/23 by DW
+				break;
 			}
-		
-		
-		
-		
 		}
 	function pushState (tabname) {
 		var state = {
@@ -96,8 +120,27 @@ function tabsManager (userOptions, callback) {
 		return (undefined);
 		}
 	
-	function setupDomStructure () {
-		const divContainer = $("<div class=\"divTabsContainer\"></div>");
+	function setupDomStructure (flStarting=true) {
+		var divContainer = $(".divTabsContainer");
+		
+		function getContainer () {
+			if (divContainer.length == 0) {
+				divContainer = $("<div class=\"divTabsContainer\"></div>");
+				}
+			else {
+				divContainer.empty ();
+				}
+			return (divContainer);
+			}
+		function getTabContent () {
+			if (divTabContent === undefined) {
+				divTabContent = $("<div class=\"divTabContent\"></div>");
+				}
+			return (divTabContent);
+			}
+		
+		divContainer = getContainer (); //1/6/24 by DW
+		
 		const divTabs = $("<div class=\"divTabs\"></div>");
 		const ulTabs = $("<ul class=\"nav nav-tabs\"></ul>");
 		
@@ -109,18 +152,21 @@ function tabsManager (userOptions, callback) {
 		function setActiveTab (liTab) {
 			$(".spCloseBox").css ("visibility", "hidden"); //hide all closeboxes
 			$(".liTab").removeClass ("active"); //make all tabs not active
-			liTab.addClass ("active"); //make this tab acrive
+			liTab.addClass ("active"); //make this tab active
 			makeActiveCloseBoxVisible ();
 			
-			var tabRec = findTabWithName (liTab.attr ("name"))
-			displayTabContents (tabRec);
+			if (flStarting) {
+				const liName = liTab.attr ("name");
+				const tabRec = findTabWithName (liName)
+				displayTabContents (tabRec);
+				}
 			}
 		function isEnabled (tabRec) { //enabled defaults to true
 			const enabled = (tabRec.enabled === undefined) ? true : getBoolean (tabRec.enabled);
 			return (enabled);
 			}
 		
-		divTabContent = $("<div class=\"divTabContent\"></div>");
+		divTabContent = getTabContent ();
 		
 		var flFoundTab = false, firstTab = undefined, ctTabs = 0;
 		for (var x in options.theTabs) {
@@ -211,6 +257,7 @@ function tabsManager (userOptions, callback) {
 					liTab.click (function () {
 						setActiveTab (liTab);
 						pushState (item.name);
+						options.tabClickCallback (item);
 						});
 					ctTabs++;
 					}
@@ -229,9 +276,16 @@ function tabsManager (userOptions, callback) {
 		return (divContainer);
 		}
 	
-	const divContainer = setupDomStructure ();
-	options.whereToAppend.append (divContainer);
-	divContainer.trigger ("afterinsert");
+	function buildTabs (flStarting) {
+		const divContainer = setupDomStructure (flStarting);
+		options.whereToAppend.append (divContainer);
+		divContainer.trigger ("afterinsert");
+		}
+	buildTabs (true);
+	
+	if ($(".nav-tabs li").length == 1) { //1/10/24 by DW
+		$(".divTabs").css ("display", "none");
+		}
 	
 	activateToolTips ();
 	window.addEventListener ("popstate", function (ev) {
@@ -257,4 +311,12 @@ function tabsManager (userOptions, callback) {
 		var tabRec = findTabWithName (name)
 		return (tabRec);
 		};
+	
+	this.rebuildTabs = function () {
+		buildTabs (false); //not starting
+		}
+	
+	if (callback !== undefined) { //1/6/24 by DW
+		callback ();
+		}
 	}
