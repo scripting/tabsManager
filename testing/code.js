@@ -1,5 +1,5 @@
 const appConsts = {
-	urlFeedlandServer: "https://feedland.com/"
+	urlFeedlandServer: "https://feedland.social/"
 	}
 
 var theTabs =  {
@@ -78,4 +78,5 @@ function startup () {
 		getInfoTableForTab
 		};
 	tabsManager (options);
+	hitCounter ();
 	}

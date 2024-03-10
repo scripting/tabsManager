@@ -3,6 +3,10 @@ function tabsManager (userOptions, callback) {
 	
 	var divTabContent = undefined;
 	
+	function activateToolTips () { 
+		$("[data-toggle=\"tooltip\"]").tooltip ();
+		}
+	
 	const options = {
 		defaultType: "river",
 		defaultIcon: "fa fa-file-alt",
@@ -50,7 +54,7 @@ function tabsManager (userOptions, callback) {
 		const flMobile = window.innerWidth <= 576;
 		return (flMobile);
 		}
-	const maxTabs = (isMobileDevice ()) ? 4 : infinity; //12/10/23 by DW
+	const maxTabs = (isMobileDevice ()) ? 4 : Infinity; //12/10/23 by DW & 3/9/24 by DW
 	
 	function viewRiver (tabRec) {
 		console.log ("viewRiver");
